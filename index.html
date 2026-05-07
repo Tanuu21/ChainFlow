@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>ChainDesk — Web3 Command Center</title>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Ethers -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+  <!-- Chart -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+
+    *{
+      font-family:'Inter',sans-serif;
+    }
+
+    body{
+      background:#050816;
+      color:white;
+      overflow-x:hidden;
+    }
+
+    .glass{
+      background:rgba(255,255,255,0.05);
+      backdrop-filter:blur(14px);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+
+    .gradient{
+      background:linear-gradient(
+        135deg,
+        #6d28d9,
+        #2563eb,
+        #06b6d4
+      );
+    }
+
+    .glow{
+      box-shadow:0 0 30px rgba(99,102,241,.35);
+    }
+
+    .card-hover{
+      transition:.3s;
+    }
+
+    .card-hover:hover{
+      transform:translateY(-5px);
+      box-shadow:0 10px 30px rgba(0,0,0,.4);
+    }
+
+    .sidebar-link{
+      transition:.3s;
+    }
+
+    .sidebar-link:hover{
+      background:rgba(255,255,255,.08);
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <!-- MAIN WRAPPER -->
+  <div class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 hidden lg:flex flex-col p-6 glass border-r border-white/10">
+
+      <div>
+        <h1 class="text-3xl font-extrabold gradient bg-clip-text text-transparent">
+          ChainDesk
+        </h1>
+
+        <p class="text-sm text-gray-400 mt-2">
+          All-in-One Web3 Command Center
+        </p>
+      </div>
+
+      <nav class="mt-10 space-y-3">
+
+        <a href="#"
+        class="sidebar-link flex items-center gap-3 p-4 rounded-xl">
+          📊 Dashboard
+        </a>
+
+        <a href="#"
+        class="sidebar-link flex items-center gap-3 p-4 rounded-xl">
+          👛 Wallet
+        </a>
+
+        <a href="#"
+        class="sidebar-link flex items-center gap-3 p-4 rounded-xl">
+          🛡 Risk Scanner
+        </a>
+
+        <a href="#"
+        class="sidebar-link flex items-center gap-3 p-4 rounded-xl">
+          ⛽ Gas Tracker
+        </a>
+
+        <a href="#"
+        class="sidebar-link flex items-center gap-3 p-4 rounded-xl">
+          📈 Markets
+        </a>
+
+      </nav>
+
+      <div class="mt-auto">
+
+        <div class="glass p-5 rounded-2xl">
+
+          <p class="text-sm text-gray-400">
+            Powered By
+          </p>
+
+          <h2 class="font-bold mt-2">
+            Ethereum • Solana • CoinGecko
+          </h2>
+
+        </div>
+
+      </div>
+
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="flex-1 p-5 lg:p-10">
+
+      <!-- TOPBAR -->
+      <div class="flex flex-col lg:flex-row gap-4 justify-between items-center">
+
+        <div>
+          <h2 class="text-4xl font-bold">
+            Web3 Dashboard
+          </h2>
+
+          <p class="text-gray-400 mt-2">
+            Monitor wallets, gas fees, crypto prices & security.
+          </p>
+        </div>
+
+        <div class="flex gap-3 flex-wrap">
+
+          <button
+          id="connectWallet"
+          class="gradient px-6 py-3 rounded-xl font-semibold glow">
+            Connect MetaMask
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- STATS -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-10">
+
+        <div class="glass rounded-3xl p-6 card-hover">
+          <p class="text-gray-400">
+            ETH Balance
+          </p>
+
+          <h2
+          id="ethBalance"
+          class="text-3xl font-bold mt-3">
+            0.000
+          </h2>
+        </div>
+
+        <div class="glass rounded-3xl p-6 card-hover">
+          <p class="text-gray-400">
+            Wallet Address
+          </p>
+
+          <h2
+          id="walletAddress"
+          class="text-sm font-bold mt-3 break-all">
+            Not Connected
+          </h2>
+        </div>
+
+        <div class="glass rounded-3xl p-6 card-hover">
+          <p class="text-gray-400">
+            ETH Gas
+          </p>
+
+          <h2
+          id="gasFee"
+          class="text-3xl font-bold mt-3">
+            Loading...
+          </h2>
+        </div>
+
+        <div class="glass rounded-3xl p-6 card-hover">
+          <p class="text-gray-400">
+            Portfolio Value
+          </p>
+
+          <h2
+          id="portfolioValue"
+          class="text-3xl font-bold mt-3">
+            $0
+          </h2>
+        </div>
+
+      </div>
+
+      <!-- CHART -->
+      <div class="glass rounded-3xl p-6 mt-10">
+
+        <div class="flex justify-between items-center">
+
+          <div>
+            <h2 class="text-2xl font-bold">
+              Portfolio Analytics
+            </h2>
+
+            <p class="text-gray-400 mt-2">
+              Weekly crypto portfolio activity
+            </p>
+          </div>
+
+        </div>
+
+        <canvas
+        id="portfolioChart"
+        class="mt-10">
+        </canvas>
+
+      </div>
+
+      <!-- MARKET -->
+      <div class="mt-10">
+
+        <div class="flex justify-between items-center">
+
+          <h2 class="text-3xl font-bold">
+            Live Market Prices
+          </h2>
+
+        </div>
+
+        <div
+        id="marketGrid"
+        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mt-6">
+        </div>
+
+      </div>
+
+      <!-- WALLET ANALYZER -->
+      <div class="glass rounded-3xl p-6 mt-10">
+
+        <h2 class="text-3xl font-bold">
+          Wallet Risk Scanner
+        </h2>
+
+        <p class="text-gray-400 mt-2">
+          Analyze wallet activity & risk level
+        </p>
+
+        <div class="flex flex-col lg:flex-row gap-4 mt-6">
+
+          <input
+          type="text"
+          id="walletInput"
+          placeholder="Enter Wallet Address"
+          class="flex-1 bg-[#0f172a] border border-white/10 rounded-xl p-4 outline-none"/>
+
+          <button
+          onclick="analyzeWallet()"
+          class="gradient px-8 rounded-xl font-bold">
+            Analyze
+          </button>
+
+        </div>
+
+        <div
+        id="walletResult"
+        class="mt-6 text-gray-300">
+          No wallet analyzed.
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+</html>
